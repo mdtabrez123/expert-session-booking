@@ -24,7 +24,8 @@ export function useExperts() {
       const params = new URLSearchParams({ page: pageNum, limit: LIMIT });
       if (cat) params.append('category', cat);
 
-      const res = await fetch(`/api/experts?${params.toString()}`);
+      const baseUrl = import.meta.env.VITE_API_URL || '';
+      const res = await fetch(`${baseUrl}/api/experts?${params.toString()}`);
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
         throw new Error(body.message || `Server error ${res.status}`);
