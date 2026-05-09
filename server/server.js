@@ -1,6 +1,7 @@
 require('dotenv').config();
 const http = require('http');
 const express = require('express');
+const cors = require('cors');
 const { Server } = require('socket.io');
 const connectDB = require('./src/config/db');
 const socketConfig = require('./src/config/socket');
@@ -12,6 +13,24 @@ const errorHandler = require('./src/middleware/errorHandler');
 connectDB();
 
 const app = express();
+
+const allowedOrigins = [
+  'https://expert-session-booking-13sh.vercel.app',
+  'http://localhost:5173'
+];
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  optionsSuccessStatus: 200,
+};
+
+app.use(cors(corsOptions));
 
 // ─── Middleware ───────────────────────────────────────────────────────────────
 app.use(express.json());
@@ -48,7 +67,7 @@ const httpServer = http.createServer(app);
 
 const io = new Server(httpServer, {
   cors: {
-    origin: '*', // Restrict to your frontend origin in production
+    origin: "https://expert-session-booking-13sh.vercel.app", // Restrict to your frontend origin in production
     methods: ['GET', 'POST'],
   },
 });
