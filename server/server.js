@@ -67,7 +67,7 @@ const httpServer = http.createServer(app);
 
 const io = new Server(httpServer, {
   cors: {
-    origin: "https://expert-session-booking-13sh.vercel.app", // Restrict to your frontend origin in production
+    origin:"https://expert-session-booking-nxwl.vercel.app", // Restrict to your frontend origin in production
     methods: ['GET', 'POST'],
   },
 });
