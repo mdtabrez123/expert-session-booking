@@ -14,19 +14,9 @@ connectDB();
 
 const app = express();
 
-// --- CORS Configuration ----------------------------------------------------
+// --- Simplified CORS Configuration (Allow All) --------------------------
 app.use(cors({
-  origin: function(origin, callback) {
-    if (
-      !origin ||
-      origin.includes('vercel.app') ||
-      origin.includes('localhost')
-    ) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: true,
   credentials: true
 }));
 
@@ -60,22 +50,11 @@ app.use((req, res) => {
 app.use(errorHandler);
 
 // ─── HTTP Server + Socket.io ──────────────────────────────────────────────────
-// Wrap Express in a raw http.Server so Socket.io can share the same port.
 const httpServer = http.createServer(app);
 
 const io = new Server(httpServer, {
   cors: {
-    origin: (origin, callback) => {
-      if (
-        !origin ||
-        origin.includes('vercel.app') ||
-        origin.includes('localhost')
-      ) {
-        callback(null, true);
-      } else {
-        callback(new Error('Not allowed by CORS'));
-      }
-    },
+    origin: "*", // Allow all origins for Socket.IO
     methods: ['GET', 'POST'],
     credentials: true
   }
