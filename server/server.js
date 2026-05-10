@@ -14,23 +14,14 @@ connectDB();
 
 const app = express();
 
-const allowedOrigins = [
-  'https://expert-session-booking-13sh.vercel.app',
-  'http://localhost:5173'
-];
-
-const corsOptions = {
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  optionsSuccessStatus: 200,
-};
-
-app.use(cors(corsOptions));
+// --- CORS Configuration ----------------------------------------------------
+app.use(cors({
+  origin: [
+    'https://expert-session-booking-sand.vercel.app',
+    'http://localhost:5173'
+  ],
+  credentials: true
+}));
 
 // ─── Middleware ───────────────────────────────────────────────────────────────
 app.use(express.json());
