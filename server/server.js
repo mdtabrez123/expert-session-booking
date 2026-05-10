@@ -15,7 +15,9 @@ connectDB();
 const app = express();
 
 const allowedOrigins = [
+  'https://expert-session-booking-eight.vercel.app',
   'https://expert-session-booking-sand.vercel.app',
+  'https://expert-session-booking-nxwl.vercel.app',
   'http://localhost:5173'
 ];
 
