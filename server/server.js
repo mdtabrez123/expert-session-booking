@@ -14,12 +14,15 @@ connectDB();
 
 const app = express();
 
+const allowedOrigins = [
+  'https://expert-session-booking-sand.vercel.app',
+  'https://expert-session-booking-nxwl.vercel.app',
+  'http://localhost:5173'
+];
+
 // --- CORS Configuration ----------------------------------------------------
 app.use(cors({
-  origin: [
-    'https://expert-session-booking-sand.vercel.app',
-    'http://localhost:5173'
-  ],
+  origin: allowedOrigins,
   credentials: true
 }));
 
@@ -58,9 +61,10 @@ const httpServer = http.createServer(app);
 
 const io = new Server(httpServer, {
   cors: {
-    origin:"https://expert-session-booking-nxwl.vercel.app", // Restrict to your frontend origin in production
+    origin: allowedOrigins,
     methods: ['GET', 'POST'],
-  },
+    credentials: true
+  }
 });
 
 // Store the io instance in the singleton so controllers can reach it via getIO()
