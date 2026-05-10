@@ -1,33 +1,65 @@
-import { useState, useEffect, useContext } from 'react';
-import { SocketContext } from '../App'; // Assuming App.jsx exports SocketContext
+import { useState, useEffect, useContext, useCallback } from 'react';
+import { SocketContext } from '../App';
 
-export function useBookedSlots(expertId) {
+export function useBookedSlots(expertId, selectedDate) {
   const socket = useContext(SocketContext);
-  const [bookedSlots, setBookedSlots] = useState([]);
+  const [bookedSlots, setBookedSlots] = useState(new Set());
+  const [loadingSlots, setLoadingSlots] = useState(true);
+
+  const fetchBookings = useCallback(async () => {
+    if (!expertId || !selectedDate) return;
+    
+    setLoadingSlots(true);
+    try {
+      const res = await fetch(`/api/bookings/expert/${expertId}`);
+      const json = await res.json();
+      
+      if (json.success) {
+        // Extract YYYY-MM-DD from the booking date and check it against selectedDate
+        const slotsForDate = json.data
+          .filter(b => b.status !== 'cancelled' && b.date.split('T')[0] === selectedDate)
+          .map(b => b.timeSlot);
+          
+        setBookedSlots(new Set(slotsForDate));
+      } else {
+        setBookedSlots(new Set());
+      }
+    } catch (err) {
+      console.error('Error fetching bookings:', err);
+      setBookedSlots(new Set());
+    } finally {
+      setLoadingSlots(false);
+    }
+  }, [expertId, selectedDate]);
 
   useEffect(() => {
-    if (!socket || !expertId) return;
+    fetchBookings();
+  }, [fetchBookings]);
 
-    // Join the room for this expert
-    socket.emit('join-expert-room', expertId);
+  useEffect(() => {
+    if (!socket) return;
 
-    // Listen for initial booked slots
-    socket.on('initial-booked-slots', (slots) => {
-      setBookedSlots(slots);
-    });
-
-    // Listen for real-time updates
-    socket.on('booking-update', (updatedBooking) => {
-      setBookedSlots((prevSlots) => [...prevSlots, updatedBooking.slot]);
-    });
-
-    // Clean up on component unmount or when expertId changes
-    return () => {
-      socket.emit('leave-expert-room', expertId);
-      socket.off('initial-booked-slots');
-      socket.off('booking-update');
+    const handleSlotBooked = (booking) => {
+      // Check if the booking is for the current expert and selected date
+      if (
+        booking.expertId === expertId && 
+        booking.date.split('T')[0] === selectedDate &&
+        booking.status !== 'cancelled'
+      ) {
+        setBookedSlots((prev) => {
+          const next = new Set(prev);
+          next.add(booking.timeSlot);
+          return next;
+        });
+      }
     };
-  }, [socket, expertId]);
 
-  return bookedSlots;
+    socket.on('slotBooked', handleSlotBooked);
+
+    return () => {
+      socket.off('slotBooked', handleSlotBooked);
+    };
+  }, [socket, expertId, selectedDate]);
+
+  return { bookedSlots, loadingSlots, refetch: fetchBookings };
 }

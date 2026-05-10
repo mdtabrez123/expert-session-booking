@@ -33,15 +33,20 @@ export default function App() {
   useEffect(() => {
     socket.connect();
 
-    socket.on('connect', () => {
+    const onConnect = () => {
       console.log('Connected to socket server:', socket.id);
-    });
+    };
 
-    socket.on('disconnect', () => {
+    const onDisconnect = () => {
       console.log('Disconnected from socket server');
-    });
+    };
+
+    socket.on('connect', onConnect);
+    socket.on('disconnect', onDisconnect);
 
     return () => {
+      socket.off('connect', onConnect);
+      socket.off('disconnect', onDisconnect);
       socket.disconnect();
     };
   }, []);
