@@ -1,77 +1,131 @@
-# Expert Session Booking
+# 🚀 ExpertBook - Premium Expert Session Booking Platform
 
-This is a full-stack web application for booking sessions with experts. Users can browse a list of experts, filter them by category, view their details, and book available time slots.
+ExpertBook is a sophisticated, full-stack web application designed for seamless session booking with industry experts. Featuring a premium **"Near-Black & Deep Violet"** design system, the platform offers a high-end user experience with fluid animations and real-time data synchronization.
 
-## Features
+![ExpertBook Screenshot](https://via.placeholder.com/1200x600/0c0c0e/7c3aed?text=ExpertBook+Premium+UI)
 
-*   Browse and search for experts.
-*   Filter experts by category.
-*   View detailed expert profiles with availability.
-*   Book a session with an expert.
-*   View a list of personal bookings.
-*   Real-time updates for bookings.
+## ✨ Core Features
 
-## Tech Stack
+-   **💎 Premium UI/UX**: Crafted with a glassmorphic aesthetic, custom HSL-based color palettes, and modern typography (Outfit/Inter).
+-   **🎬 Smooth Animations**: Powered by **Framer Motion** for spring-based transitions, hover effects, and layout animations.
+-   **🔍 Dynamic Discovery**: Real-time expert search and category-based filtering with paginated results (6 per page).
+-   **⚡ Real-Time Sync**: Integrated with **Socket.io** to reflect booked slots across all clients instantly.
+-   **📅 Smart Scheduling**: Interactive calendar with local-date handling and intelligent time-slot validation.
+-   **🛡️ Robust Backend**: Built with **Express 5** and **MongoDB**, featuring structured error handling and unified static serving.
+-   **📦 Production Optimized**: A unified deployment architecture where the Express server serves the React production bundle.
 
-*   **Frontend:**
-    *   React
-    *   Vite
-    *   JavaScript
-    *   CSS
-*   **Backend:**
-    *   Node.js
-    *   Express.js
-    *   MongoDB (with Mongoose)
-    *   Socket.IO for real-time communication.
+---
 
-## Project Structure
+## 🛠️ Tech Stack
 
-The project is divided into two main parts:
+### Frontend
+-   **React 19** & **Vite 8**
+-   **Tailwind CSS v4** (Utility-first styling)
+-   **Framer Motion** (Orchestrated animations)
+-   **Socket.io Client** (Real-time events)
+-   **React Router 7** (Declarative routing)
 
-*   `client/`: Contains the React frontend application.
-*   `server/`: Contains the Node.js/Express.js backend server and API.
+### Backend
+-   **Node.js** & **Express 5**
+-   **MongoDB** & **Mongoose** (ODM)
+-   **Socket.io** (WebSockets)
+-   **Dotenv** (Environment management)
 
-## Getting Started
+---
 
-### Prerequisites
+## 📂 Project Structure
 
-*   Node.js (v14 or later)
-*   npm
-*   MongoDB (running on `mongodb://localhost:27017/expert-booking`)
+```text
+expert-session-booking/
+├── client/                # React Frontend
+│   ├── src/
+│   │   ├── components/    # Reusable UI components
+│   │   ├── hooks/         # Custom React hooks (useExperts, useBookedSlots)
+│   │   ├── pages/         # Page components (Home, ExpertDetail, MyBookings)
+│   │   └── socket.js      # Socket.io client configuration
+│   └── vite.config.js     # Vite & Proxy settings
+├── server/                # Express Backend
+│   ├── src/
+│   │   ├── models/        # Mongoose schemas (Expert, Booking)
+│   │   ├── routes/        # API route definitions
+│   │   └── config/        # DB and Socket configurations
+│   ├── server.js          # Entry point & unified static serving
+│   └── seed.js            # Database seeding script
+└── package.json           # Root scripts for unified management
+```
 
-### Installation & Setup
+---
 
-1.  **Clone the repository:**
-    ```bash
-    git clone <repository-url>
-    cd expert-session-booking
-    ```
+## 🚦 API Endpoints
 
-2.  **Setup the Server:**
-    ```bash
-    cd server
-    npm install
-    ```
-    You may need to create a `.env` file in the `server` directory to configure environment variables like the database connection string if it's not hardcoded.
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `GET` | `/api/experts` | Fetch experts (supports `page`, `limit`, and `category` query params) |
+| `GET` | `/api/experts/:id` | Get detailed profile of a specific expert |
+| `GET` | `/api/bookings` | Retrieve bookings for a user email (via `email` query param) |
+| `POST` | `/api/bookings` | Create a new session booking (emits `slotBooked` socket event) |
+| `GET` | `/api/bookings/expert/:id` | Get all existing bookings for an expert |
 
-3.  **Setup the Client:**
-    ```bash
-    cd ../client
-    npm install
-    ```
+---
 
-### Running the Application
+## 🚀 Installation & Setup
 
-1.  **Start the Backend Server:**
-    From the `server` directory, run:
-    ```bash
-    npm start
-    ```
-    The server will start on `http://localhost:5000` by default.
+### 1. Clone & Install
+```bash
+git clone <repository-url>
+cd expert-session-booking
 
-2.  **Start the Frontend Development Server:**
-    From the `client` directory, run:
-    ```bash
-    npm run dev
-    ```
-    The client application will be available at `http://localhost:5173` by default.
+# Install all dependencies (Root, Server, and Client)
+npm run install-all
+```
+
+### 2. Environment Configuration
+Create a `.env` file in the `server/` directory:
+```env
+PORT=5000
+MONGO_URI=your_mongodb_atlas_uri_or_local_uri
+NODE_ENV=development
+```
+
+### 3. Seed Database
+To populate your database with initial experts:
+```bash
+cd server
+node seed.js
+```
+
+---
+
+## 🏃 Running the Application
+
+### Development (Recommended for Coding)
+Start both servers simultaneously in separate terminals:
+
+**Backend (Port 5000):**
+```bash
+cd server
+npm run dev
+```
+
+**Frontend (Port 5173):**
+```bash
+cd client
+npm run dev
+```
+
+### Unified Production Mode (Deployment)
+Serve the entire app from the backend server:
+```bash
+# From the root directory:
+# 1. Build the frontend
+npm run build
+
+# 2. Start the unified server
+npm start
+```
+Access the application at `http://localhost:5000`.
+
+---
+
+## 📄 License
+Licensed under the **ISC License**. Created with ❤️ for expert collaboration.
