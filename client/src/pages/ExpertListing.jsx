@@ -1,73 +1,13 @@
 import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { io } from 'socket.io-client';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
-import { useExperts }      from '../hooks/useExperts';
+import { useExperts } from '../hooks/useExperts';
 import ExpertCard          from '../components/ExpertCard';
 import SearchBar           from '../components/SearchBar';
 import CategoryFilter      from '../components/CategoryFilter';
 import Pagination          from '../components/Pagination';
 import LoadingSpinner, { CardSkeleton } from '../components/LoadingSpinner';
 import ErrorMessage        from '../components/ErrorMessage';
-
-/* ── Real-time toast ───────────────────────────────────────────────────────── */
-function SlotToast({ booking, onDismiss }) {
-  useEffect(() => {
-    const t = setTimeout(onDismiss, 5000);
-    return () => clearTimeout(t);
-  }, [onDismiss]);
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20, scale: 0.95 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: 10, scale: 0.95 }}
-      transition={{ type: 'spring', stiffness: 380, damping: 32 }}
-      className="fixed bottom-6 right-6 z-50 max-w-sm"
-    >
-      <div
-        className="flex items-start gap-3 p-4 rounded-2xl shadow-2xl"
-        style={{
-          background: '#18181b',
-          border: '1px solid rgba(255,255,255,0.08)',
-          boxShadow: '0 0 0 1px rgba(255,255,255,0.04), 0 20px 60px rgba(0,0,0,0.6)',
-        }}
-      >
-        {/* Progress bar */}
-        <div className="absolute bottom-0 left-0 right-0 h-[2px] rounded-b-2xl overflow-hidden">
-          <motion.div
-            className="h-full origin-left"
-            style={{ background: 'linear-gradient(90deg, #8b5cf6, #6366f1)' }}
-            initial={{ scaleX: 1 }}
-            animate={{ scaleX: 0 }}
-            transition={{ duration: 5, ease: 'linear' }}
-          />
-        </div>
-
-        <div
-          className="flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center"
-          style={{ background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.25)' }}
-        >
-          <svg className="h-4 w-4 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
-          </svg>
-        </div>
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-zinc-100">Slot Just Booked</p>
-          <p className="text-xs text-zinc-500 mt-0.5 truncate">
-            <span className="text-zinc-300">{booking.userName}</span> booked{' '}
-            <span className="text-zinc-300">{booking.expertName}</span> @ {booking.timeSlot}
-          </p>
-        </div>
-        <button onClick={onDismiss} className="flex-shrink-0 p-1 text-zinc-600 hover:text-zinc-300 transition-colors">
-          <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12"/>
-          </svg>
-        </button>
-      </div>
-    </motion.div>
-  );
-}
 
 /* ── Empty state ───────────────────────────────────────────────────────────── */
 function EmptyState({ hasFilters }) {
@@ -109,13 +49,6 @@ export default function ExpertListing() {
   const { scrollY } = useScroll();
   const navBg = useTransform(scrollY, [0, 60], ['rgba(6,6,7,0)', 'rgba(6,6,7,0.9)']);
   const navBorder = useTransform(scrollY, [0, 60], ['rgba(255,255,255,0)', 'rgba(255,255,255,0.06)']);
-
-  // Real-time slot updates
-  useEffect(() => {
-    const socket = io('http://127.0.0.1:5000', { transports: ['websocket'] });
-    socket.on('slotBooked', (data) => setToast(data));
-    return () => socket.disconnect();
-  }, []);
 
   const hasFilters = !!searchQuery || !!category;
 
@@ -346,11 +279,6 @@ export default function ExpertListing() {
           </>
         )}
       </main>
-
-      {/* Real-time toast */}
-      <AnimatePresence>
-        {toast && <SlotToast booking={toast} onDismiss={() => setToast(null)} />}
-      </AnimatePresence>
     </div>
   );
 }
