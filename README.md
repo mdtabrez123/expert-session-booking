@@ -1,131 +1,116 @@
-# 🚀 ExpertBook - Premium Expert Session Booking Platform
+# 🚀 ExpertBook: Real-Time Expert Session Booking System
 
-ExpertBook is a sophisticated, full-stack web application designed for seamless session booking with industry experts. Featuring a premium **"Near-Black & Deep Violet"** design system, the platform offers a high-end user experience with fluid animations and real-time data synchronization.
+[![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactjs.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
+[![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
+[![Socket.io](https://img.shields.io/badge/Socket.io-010101?style=for-the-badge&logo=socketdotio&logoColor=white)](https://socket.io/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 
-![ExpertBook Screenshot](https://via.placeholder.com/1200x600/0c0c0e/7c3aed?text=ExpertBook+Premium+UI)
-
-## ✨ Core Features
-
--   **💎 Premium UI/UX**: Crafted with a glassmorphic aesthetic, custom HSL-based color palettes, and modern typography (Outfit/Inter).
--   **🎬 Smooth Animations**: Powered by **Framer Motion** for spring-based transitions, hover effects, and layout animations.
--   **🔍 Dynamic Discovery**: Real-time expert search and category-based filtering with paginated results (6 per page).
--   **⚡ Real-Time Sync**: Integrated with **Socket.io** to reflect booked slots across all clients instantly.
--   **📅 Smart Scheduling**: Interactive calendar with local-date handling and intelligent time-slot validation.
--   **🛡️ Robust Backend**: Built with **Express 5** and **MongoDB**, featuring structured error handling and unified static serving.
--   **📦 Production Optimized**: A unified deployment architecture where the Express server serves the React production bundle.
+ExpertBook is a high-performance, full-stack booking platform that connects users with industry experts for 1-on-1 sessions. Designed with a focus on **real-time synchronization** and **concurrency safety**, it provides a premium user experience with zero-latency updates and a sleek, modern aesthetic.
 
 ---
 
-## 🛠️ Tech Stack
-
-### Frontend
--   **React 19** & **Vite 8**
--   **Tailwind CSS v4** (Utility-first styling)
--   **Framer Motion** (Orchestrated animations)
--   **Socket.io Client** (Real-time events)
--   **React Router 7** (Declarative routing)
-
-### Backend
--   **Node.js** & **Express 5**
--   **MongoDB** & **Mongoose** (ODM)
--   **Socket.io** (WebSockets)
--   **Dotenv** (Environment management)
+## 🔗 Live Demo
+-   **Frontend**: [expertbook-client.onrender.com](https://expertbook-client.onrender.com) (Placeholder)
+-   **API**: [expertbook-api.onrender.com](https://expertbook-api.onrender.com) (Placeholder)
 
 ---
 
-## 📂 Project Structure
+## ✨ Features
+
+### 📡 Real-Time Slot Synchronization
+Never see a stale slot again. Using **WebSockets (Socket.io)**, the platform broadcasts booking events to all connected clients instantly. When a user books a slot, it is disabled on every other user's screen in real-time, preventing frustration and unnecessary clicks.
+
+### 🛡️ Race Condition Prevention
+We handle high-traffic booking scenarios with a double-layered defense:
+1.  **Application-Level Validation**: The server checks slot availability before processing.
+2.  **Database-Level Atomic Locks**: A compound unique index in MongoDB (`expertId` + `date` + `timeSlot`) ensures that even if two requests hit the server at the exact same millisecond, only one will succeed.
+
+### 🎨 Premium UI/UX
+-   **Near-Black / Deep Violet Aesthetic**: A professional, dark-themed design system.
+-   **Framer Motion Animations**: Smooth, spring-based transitions and micro-animations.
+-   **Responsive Design**: Fully optimized for mobile, tablet, and desktop.
+
+---
+
+## 📁 Project Structure (MVC)
+
+The project follows a clean **Model-View-Controller** architecture for maximum scalability.
 
 ```text
 expert-session-booking/
-├── client/                # React Frontend
+├── client/                # VIEW Layer (React)
 │   ├── src/
-│   │   ├── components/    # Reusable UI components
-│   │   ├── hooks/         # Custom React hooks (useExperts, useBookedSlots)
-│   │   ├── pages/         # Page components (Home, ExpertDetail, MyBookings)
-│   │   └── socket.js      # Socket.io client configuration
-│   └── vite.config.js     # Vite & Proxy settings
-├── server/                # Express Backend
+│   │   ├── components/    # Reusable UI Components
+│   │   ├── hooks/         # Custom Business Logic Hooks
+│   │   ├── pages/         # Page Views (Home, Details, History)
+│   │   └── socket.js      # WebSocket Client Configuration
+├── server/                # CONTROLLER & MODEL Layer (Express/Mongoose)
 │   ├── src/
-│   │   ├── models/        # Mongoose schemas (Expert, Booking)
-│   │   ├── routes/        # API route definitions
-│   │   └── config/        # DB and Socket configurations
-│   ├── server.js          # Entry point & unified static serving
-│   └── seed.js            # Database seeding script
-└── package.json           # Root scripts for unified management
+│   │   ├── models/        # Mongoose Schemas (Data Models)
+│   │   ├── controllers/   # Business Logic (Request Handlers)
+│   │   ├── routes/        # API Endpoints
+│   │   └── config/        # DB & Socket Initialization
+│   └── server.js          # App Entry Point
 ```
 
 ---
 
-## 🚦 API Endpoints
+## 🚀 Installation Guide
 
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `GET` | `/api/experts` | Fetch experts (supports `page`, `limit`, and `category` query params) |
-| `GET` | `/api/experts/:id` | Get detailed profile of a specific expert |
-| `GET` | `/api/bookings` | Retrieve bookings for a user email (via `email` query param) |
-| `POST` | `/api/bookings` | Create a new session booking (emits `slotBooked` socket event) |
-| `GET` | `/api/bookings/expert/:id` | Get all existing bookings for an expert |
+### Prerequisites
+-   Node.js (v18+)
+-   MongoDB Atlas account or local MongoDB instance
 
----
-
-## 🚀 Installation & Setup
-
-### 1. Clone & Install
+### Step 1: Clone & Install Dependencies
 ```bash
-git clone <repository-url>
-cd expert-session-booking
-
-# Install all dependencies (Root, Server, and Client)
+git clone https://github.com/your-username/expert-booking.git
+cd expert-booking
 npm run install-all
 ```
 
-### 2. Environment Configuration
+### Step 2: Configure Environment
 Create a `.env` file in the `server/` directory:
 ```env
 PORT=5000
-MONGO_URI=your_mongodb_atlas_uri_or_local_uri
+MONGO_URI=your_mongodb_connection_string
 NODE_ENV=development
 ```
 
-### 3. Seed Database
-To populate your database with initial experts:
+### Step 3: Seed Dummy Data
+Populate the database with initial expert profiles:
 ```bash
 cd server
 node seed.js
 ```
 
+### Step 4: Run the Application
+```bash
+# In the root directory:
+npm run build   # Build frontend
+npm start       # Start unified server
+```
+
 ---
 
-## 🏃 Running the Application
+## 🚦 API Documentation
 
-### Development (Recommended for Coding)
-Start both servers simultaneously in separate terminals:
+### Experts API
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `GET` | `/api/experts` | Get all experts (supports pagination & category filters) |
+| `GET` | `/api/experts/:id` | Get detailed expert profile |
 
-**Backend (Port 5000):**
-```bash
-cd server
-npm run dev
-```
-
-**Frontend (Port 5173):**
-```bash
-cd client
-npm run dev
-```
-
-### Unified Production Mode (Deployment)
-Serve the entire app from the backend server:
-```bash
-# From the root directory:
-# 1. Build the frontend
-npm run build
-
-# 2. Start the unified server
-npm start
-```
-Access the application at `http://localhost:5000`.
+### Bookings API
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `POST` | `/api/bookings` | Create a new booking (with race-condition check) |
+| `GET` | `/api/bookings` | Fetch bookings by user email (`?email=...`) |
+| `GET` | `/api/bookings/expert/:id` | Get all booked slots for a specific expert |
+| `PATCH` | `/api/bookings/:id/status` | Update booking status (confirm/cancel) |
 
 ---
 
 ## 📄 License
-Licensed under the **ISC License**. Created with ❤️ for expert collaboration.
+Licensed under the **ISC License**. Developed with ❤️ for the developer community.
