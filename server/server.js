@@ -14,16 +14,19 @@ connectDB();
 
 const app = express();
 
-const allowedOrigins = [
-  'https://expert-session-booking-eight.vercel.app',
-  'https://expert-session-booking-sand.vercel.app',
-  'https://expert-session-booking-nxwl.vercel.app',
-  'http://localhost:5173'
-];
-
 // --- CORS Configuration ----------------------------------------------------
 app.use(cors({
-  origin: allowedOrigins,
+  origin: function(origin, callback) {
+    if (
+      !origin ||
+      origin.includes('vercel.app') ||
+      origin.includes('localhost')
+    ) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
 
@@ -62,7 +65,17 @@ const httpServer = http.createServer(app);
 
 const io = new Server(httpServer, {
   cors: {
-    origin: allowedOrigins,
+    origin: (origin, callback) => {
+      if (
+        !origin ||
+        origin.includes('vercel.app') ||
+        origin.includes('localhost')
+      ) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     methods: ['GET', 'POST'],
     credentials: true
   }
