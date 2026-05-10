@@ -1,5 +1,7 @@
+import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
+import { io } from 'socket.io-client';
 import ExpertListing from './pages/ExpertListing';
 import ExpertDetail  from './pages/ExpertDetail';
 import MyBookings    from './pages/MyBookings';
@@ -26,6 +28,23 @@ function AnimatedRoutes() {
 }
 
 export default function App() {
+  useEffect(() => {
+    const socket = io('https://expert-session-booking-hbdq.onrender.com');
+
+    socket.on('connect', () => {
+      console.log('Socket connected:', socket.id);
+    });
+
+    socket.on('disconnect', () => {
+      console.log('Socket disconnected');
+    });
+
+    // Clean up the socket connection when the component unmounts
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
+
   return (
     <BrowserRouter>
       <AnimatedRoutes />
