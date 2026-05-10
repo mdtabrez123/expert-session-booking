@@ -29,7 +29,8 @@ function AnimatedRoutes() {
 
 export default function App() {
   useEffect(() => {
-    const socket = io('https://expert-session-booking-hbdq.onrender.com');
+    const socketUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    const socket = io(socketUrl);
 
     socket.on('connect', () => {
       console.log('Socket connected:', socket.id);
