@@ -11,7 +11,8 @@ export function useBookedSlots(expertId, selectedDate) {
     
     setLoadingSlots(true);
     try {
-      const res = await fetch(`/api/bookings/expert/${expertId}`);
+      const baseUrl = import.meta.env.VITE_API_URL || '';
+      const res = await fetch(`${baseUrl}/api/bookings/expert/${expertId}`);
       const json = await res.json();
       
       if (json.success) {

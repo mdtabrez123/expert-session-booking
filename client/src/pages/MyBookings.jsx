@@ -48,7 +48,8 @@ export default function MyBookings() {
     setLoading(true);
     setError(null);
     try {
-      const res  = await fetch(`/api/bookings?email=${encodeURIComponent(email.trim())}`);
+      const baseUrl = import.meta.env.VITE_API_URL || '';
+      const res  = await fetch(`${baseUrl}/api/bookings?email=${encodeURIComponent(email.trim())}`);
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'Failed to fetch bookings');
       setBookings(data.data);

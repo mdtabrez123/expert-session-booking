@@ -40,7 +40,8 @@ export default function ExpertDetail() {
   useEffect(() => {
     setLoadingExpert(true);
     setExpertError(null);
-    fetch(`/api/experts/${id}`)
+    const baseUrl = import.meta.env.VITE_API_URL || '';
+    fetch(`${baseUrl}/api/experts/${id}`)
       .then((r) => { if (!r.ok) throw new Error('Expert not found'); return r.json(); })
       .then((d) => setExpert(d.data))
       .catch((e) => setExpertError(e.message))

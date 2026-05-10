@@ -41,6 +41,21 @@ app.get('/', (req, res) => {
 app.use('/api/experts', expertRoutes);
 app.use('/api/bookings', bookingRoutes);
 
+// ─── Frontend Static Serving ────────────────────────────────────────────────
+const path = require('path');
+const distPath = path.join(__dirname, '../client/dist');
+
+// Serve static assets from the client/dist folder
+app.use(express.static(distPath));
+
+// Handle any non-API GET requests by serving index.html (for client-side routing)
+app.use((req, res, next) => {
+  if (req.method === 'GET' && !req.path.startsWith('/api') && !req.path.includes('.')) {
+    return res.sendFile(path.join(distPath, 'index.html'));
+  }
+  next();
+});
+
 // ─── 404 Handler ─────────────────────────────────────────────────────────────
 app.use((req, res) => {
   res.status(404).json({ success: false, message: `Route '${req.originalUrl}' not found` });
