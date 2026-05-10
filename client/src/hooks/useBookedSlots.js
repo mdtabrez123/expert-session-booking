@@ -1,56 +1,33 @@
-import { useState, useEffect, useCallback } from 'react';
-import { io } from 'socket.io-client';
+import { useState, useEffect, useContext } from 'react';
+import { SocketContext } from '../App'; // Assuming App.jsx exports SocketContext
 
-/** Compare two date values by calendar day (ignores time) */
-const sameDay = (a, b) =>
-  new Date(a).toDateString() === new Date(b).toDateString();
+export function useBookedSlots(expertId) {
+  const socket = useContext(SocketContext);
+  const [bookedSlots, setBookedSlots] = useState([]);
 
-/**
- * Fetches existing bookings for an expert on a given date,
- * then keeps the booked-slots Set updated in real time via Socket.io.
- */
-export function useBookedSlots(expertId, selectedDate) {
-  const [bookedSlots, setBookedSlots] = useState(new Set());
-  const [loadingSlots, setLoadingSlots] = useState(false);
-
-  const fetchBookings = useCallback(async () => {
-    if (!expertId || !selectedDate) return;
-    setLoadingSlots(true);
-    try {
-      const res  = await fetch(`/api/bookings/expert/${expertId}`);
-      const data = await res.json();
-      const booked = new Set(
-        (data.data || [])
-          .filter((b) => sameDay(b.date, selectedDate) && b.status !== 'cancelled')
-          .map((b) => b.timeSlot)
-      );
-      setBookedSlots(booked);
-    } catch {
-      setBookedSlots(new Set());
-    } finally {
-      setLoadingSlots(false);
-    }
-  }, [expertId, selectedDate]);
-
-  // Fetch on mount and whenever expertId / selectedDate changes
-  useEffect(() => { fetchBookings(); }, [fetchBookings]);
-
-  // Real-time Socket.io listener
   useEffect(() => {
-    if (!expertId) return;
-    const socket = io('http://127.0.0.1:5000', { transports: ['websocket'] });
+    if (!socket || !expertId) return;
 
-    socket.on('slotBooked', (data) => {
-      // Match this expert
-      if (String(data.expertId) !== String(expertId)) return;
-      // Only update if the booked date matches the currently viewed date
-      if (selectedDate && sameDay(data.date, selectedDate)) {
-        setBookedSlots((prev) => new Set([...prev, data.timeSlot]));
-      }
+    // Join the room for this expert
+    socket.emit('join-expert-room', expertId);
+
+    // Listen for initial booked slots
+    socket.on('initial-booked-slots', (slots) => {
+      setBookedSlots(slots);
     });
 
-    return () => socket.disconnect();
-  }, [expertId, selectedDate]);
+    // Listen for real-time updates
+    socket.on('booking-update', (updatedBooking) => {
+      setBookedSlots((prevSlots) => [...prevSlots, updatedBooking.slot]);
+    });
 
-  return { bookedSlots, loadingSlots, refetch: fetchBookings };
+    // Clean up on component unmount or when expertId changes
+    return () => {
+      socket.emit('leave-expert-room', expertId);
+      socket.off('initial-booked-slots');
+      socket.off('booking-update');
+    };
+  }, [socket, expertId]);
+
+  return bookedSlots;
 }
